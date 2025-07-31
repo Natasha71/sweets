@@ -12,7 +12,6 @@ public interface SweetBox {
     void printAllSweets();//вывести информацию о всех сладостях
     void optimizeByWeight(double maxWeight);//оптимизировать по весу
     void optimizeByPrice(double maxWeight);//оптимизировать по цене
-    void fullOptimization(double maxWeight, double maxPrice);
-    void printBoxInfo();
+
     List<Sweet> getSweets();//получить список всех сладостей
 }

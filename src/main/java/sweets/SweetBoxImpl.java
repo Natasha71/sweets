@@ -13,6 +13,7 @@ public class SweetBoxImpl implements SweetBox {
     public void addSweet(Sweet sweet) {
         sweets.add(sweet);
     }
+
     //удаление послед-ей сладости
     @Override
     public void removeLast() {
@@ -28,6 +29,7 @@ public class SweetBoxImpl implements SweetBox {
             sweets.remove(index);
         }
     }
+
     //суммирование веса всех сладостей
     @Override
     public double getTotalWeight() {
@@ -46,38 +48,46 @@ public class SweetBoxImpl implements SweetBox {
 
     @Override
     public void optimizeByWeight(double maxWeight) {
-        // Сортируем по весу по убыванию (чтобы удалять самые тяжелые сначала)
-        sweets.sort(Comparator.comparingDouble(Sweet::getWeight).reversed());
+    // cоздаем временный список для сортировки
+    List<Sweet> sorted = new ArrayList<>(sweets);
+        sorted.sort(Comparator.comparingDouble(s -> s.getWeight() / s.getPrice()));
 
-        System.out.println("\nОптимизация веса (удаляем самые тяжелые):");
         while (getTotalWeight() > maxWeight && !sweets.isEmpty()) {
-            Sweet removed = sweets.remove(0);
-            System.out.printf("Удалено по весу: %s (вес: %.1f, цена: %.1f)\n",
-                    removed.getName(), removed.getWeight(), removed.getPrice());
+        // поиск индекса сладости с минимальной ценностью в основном списке
+        Sweet toRemove = sorted.get(0);
+        int index = sweets.indexOf(toRemove);
+
+        if (index != -1) {
+            Sweet removed = sweets.get(index);
+            removeByIndex(index);
+            sorted.remove(0);
+
+            System.out.printf("Удалена сладость (ценность): %s, вес: %.1f, цена: %.1f, ценность: %.1f%n",
+                    removed.getName(), removed.getWeight(), removed.getPrice(),
+                    removed.getWeight() / removed.getPrice());
         }
     }
+}
+    @Override
+    public void optimizeByPrice(double maxWeight) {
+        // создание временного списка для сортировки
+        List<Sweet> sorted = new ArrayList<>(sweets);
+        sorted.sort(Comparator.comparingDouble(Sweet::getPrice));
 
-    public void optimizeByPrice(double maxPrice) {
-        sweets.sort(Comparator.comparingDouble(Sweet::getPrice));
+        while (getTotalWeight() > maxWeight && !sweets.isEmpty()) {
+            // поиск индекса самой дешевой сладости в основном списке
+            Sweet toRemove = sorted.get(0);
+            int index = sweets.indexOf(toRemove);
 
-        System.out.println("\nОптимизация цены (удаляем самые дешевые):");
-        while (getTotalPrice() > maxPrice && !sweets.isEmpty()) {
-            Sweet removed = sweets.remove(0);
-            System.out.printf("Удалено по цене: %s (цена: %.1f, вес: %.1f)\n",
-                    removed.getName(), removed.getPrice(), removed.getWeight());
+            if (index != -1) {
+                Sweet removed = sweets.get(index);
+                removeByIndex(index);
+                sorted.remove(0);
+
+                System.out.printf("Удалена сладость (цена): %s, вес: %.1f, цена: %.1f%n",
+                        removed.getName(), removed.getWeight(), removed.getPrice());
+            }
         }
-    }
-
-    public void fullOptimization(double maxWeight, double maxPrice) {
-        System.out.println("\n=== Полная оптимизация ===");
-        System.out.println("1. Оптимизация по весу (макс. " + maxWeight + ")");
-        optimizeByWeight(maxWeight);
-
-        System.out.println("\n2. Оптимизация по цене (макс. " + maxPrice + ")");
-        optimizeByPrice(maxPrice);
-
-        System.out.println("\nИтоговые параметры коробки:");
-        printBoxInfo();
     }
 
     public void printBoxInfo() {

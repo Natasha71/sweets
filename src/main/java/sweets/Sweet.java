@@ -33,10 +33,6 @@ public abstract class Sweet {
         return uniqueParameter;
     }
 
-    public double getValue() {
-        return price / weight;
-    }
-
     //переопределение метода для лучшего вывода информации
     @Override
     public String toString() {
